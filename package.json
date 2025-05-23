@@ -1,6 +1,6 @@
 {
-  "name": "n8n-nodes-audio-transcribe",
-  "version": "0.1.0",
+  "name": "n8n-nodes-transcribe-audio",
+  "version": "0.1.1",
   "description": "Perform speech-to-text on audio files within your n8n workflows.This node provides local audio transcription, no internet or third-party APIs required for processing.",
   "keywords": [
     "n8n-community-node-package",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dioveath/n8n-nodes-audio-transcribe.git"
+    "url": "https://github.com/dioveath/n8n-nodes-transcribe-audio.git"
   },
   "engines": {
     "node": ">=20.15"
@@ -33,10 +33,10 @@
     "build": "tsc && gulp build:icons",
     "deploy": "tsc && gulp build:icons && pnpm link && cd ~/.n8n/custom && pnpm link n8n-nodes-transcribe-audio",
     "dev": "tsc --watch",
-    "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials package.json",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "npm build && npm lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    "format": "prettier nodes --write",
+    "lint": "eslint nodes package.json",
+    "lintfix": "eslint nodes package.json --fix",
+    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes package.json"
   },
   "files": [
     "dist"
@@ -45,7 +45,7 @@
     "n8nNodesApiVersion": 1,
     "credentials": [],
     "nodes": [
-      "dist/nodes/AudioTranscribeNode/AudioTranscribe.node.js"
+      "dist/nodes/AudioTranscribe/AudioTranscribe.node.js"
     ]
   },
   "devDependencies": {

@@ -1,46 +1,59 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-transcribe-audio
 
-# n8n-nodes-starter
+This is an n8n community node. It lets you perform speech-to-text on audio files within your n8n workflows. This node provides local audio transcription; no internet or third-party APIs are required for processing.
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](https://n8n.io). It includes the node linter and other dependencies.
+It utilizes Hugging Face Transformers.js and Whisper models to transcribe audio.
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-## Prerequisites
+[Installation](#installation)  
+[Operations](#operations)  
+[Models](#models)
+[Credentials](#credentials)
+[Compatibility](#compatibility)  
+[Usage](#usage)
+[Resources](#resources)  
 
-You need the following installed on your development machine:
+## Installation
 
-* [git](https://git-scm.com/downloads)
-* Node.js and pnpm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-## Using this starter
+## Operations
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+- **Transcribe**: Takes an audio file (binary input) and returns the transcribed text. It can handle various audio formats (e.g., MP3, WAV) by converting them to the required WAV format (16kHz, 16-bit PCM, mono) using FFmpeg.
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm lint` to check for errors or `npm lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+## Models
 
-## More information
+The node allows you to select from a list of pre-configured Xenova Whisper models:
+- `Xenova/whisper-tiny.en`
+- `Xenova/whisper-base.en`
+- `Xenova/whisper-small.en`
+- `Xenova/whisper-medium.en`
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
+Larger models generally provide better accuracy but require more processing power and time.
 
-## License
+## Credentials
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+This node does not require any credentials.
+
+## Compatibility
+
+- **n8n Version**: Tested with n8n versions `1.0.0` and above.
+- **Node.js Version**: Requires Node.js version `>=20.15` as specified in the `package.json`.
+
+## Usage
+
+1.  **Input**: Provide an audio file via a binary property (default: `data`).
+2.  **Binary Property Name**: Specify the name of the binary property containing the audio data if it's not `data`.
+3.  **Model Selection**: Choose the desired Whisper model for transcription.
+4.  **Output**: The node will output the transcribed text in `json.transcription` and potentially other related information.
+
+Ensure FFmpeg is installed and accessible in your n8n environment if you plan to process audio formats other than WAV, as the node relies on it for audio conversion.
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+* [Hugging Face Transformers.js](https://huggingface.co/docs/transformers.js)
+* [Xenova Whisper Models on Hugging Face](https://huggingface.co/Xenova?search_models=whisper)
+* [ffmpeg](https://ffmpeg.org/)
+* [Project Repository](https://github.com/dioveath/n8n-nodes-transcribe-audio)

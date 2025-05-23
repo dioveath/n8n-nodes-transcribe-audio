@@ -123,7 +123,7 @@ export class AudioTranscribe implements INodeType {
 					description: model,
 					action: `Transcribes audio from a binary file with ${model}`,
 				})),
-				default: 'Xenova/whisper-tiny.en'
+				default: ''
 			}
 		],
 	};
