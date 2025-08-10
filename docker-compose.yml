@@ -1,0 +1,16 @@
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-dev
+    restart: unless-stopped
+    environment:
+      - N8N_SECURE_COOKIE=false
+      - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
+      - N8N_PORT=5000
+    ports:
+      - 5000:5000
+    volumes:
+      - ./data:/home/node/.n8n
+      - ./dist:/home/node/.n8n/custom/node_modules/${REPO_NAME}
+      - ./node_modules:/home/node/.n8n/custom/node_modules
+      - /etc/localtime:/etc/localtime:ro

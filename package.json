@@ -31,19 +31,18 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc && gulp build:icons",
-    "deploy": "tsc && gulp build:icons && pnpm link && cd ~/.n8n/custom && pnpm link n8n-nodes-transcribe-audio",
     "dev": "tsc --watch",
     "format": "prettier nodes --write",
     "lint": "eslint nodes package.json",
     "lintfix": "eslint nodes package.json --fix",
-    "prepublishOnly": "npm run build && npm run lint -c .eslintrc.prepublish.js nodes package.json"
+    "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes package.json",
+    "deploy": "tsc && gulp build:icons && docker compose up"
   },
   "files": [
     "dist"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
-    "credentials": [],
     "nodes": [
       "dist/nodes/AudioTranscribe/AudioTranscribe.node.js"
     ]
@@ -55,16 +54,19 @@
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.9.2"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
   },
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
-    "@ffprobe-installer/ffprobe": "^2.1.2",
-    "@huggingface/transformers": "^3.5.1",
-    "fluent-ffmpeg": "^2.1.3",
+    "@huggingface/transformers": "^3.7.1",
+    "onnxruntime-web": "^1.22.0",
     "wavefile": "^11.0.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "onnxruntime-node": "npm:onnxruntime-web@^1.22.0"
+    }
   }
 }
