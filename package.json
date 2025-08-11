@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-transcribe-audio",
-  "version": "0.1.2",
+  "version": "0.1.21",
   "description": "Perform speech-to-text on audio files within your n8n workflows.This node provides local audio transcription, no internet or third-party APIs required for processing.",
   "keywords": [
     "n8n-community-node-package",
@@ -20,6 +20,9 @@
     "wav"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "homepage": "",
   "author": {
     "name": "raisaroj",
@@ -33,6 +36,7 @@
     "node": ">=20.15"
   },
   "main": "index.js",
+  "packageManager": "pnpm@10.11.0",
   "scripts": {
     "build": "tsc && gulp build:icons",
     "dev": "tsc --watch",
@@ -58,7 +62,7 @@
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.9.2"
+    "typescript": "^5.8.2"
   },
   "peerDependencies": {
     "n8n-workflow": "*"

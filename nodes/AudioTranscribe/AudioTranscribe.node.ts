@@ -27,7 +27,7 @@ const MODELS_LIST = [
 export class AudioTranscribe implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Transcribe Audio',
-		name: 'transcribeAudio',
+		name: 'audioTranscribe',
 		group: ['transform'],
 		version: 1,
 		description: 'Transcribe audio',
