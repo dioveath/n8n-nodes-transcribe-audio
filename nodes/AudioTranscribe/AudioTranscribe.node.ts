@@ -26,13 +26,15 @@ const MODELS_LIST = [
 
 export class AudioTranscribe implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Audio Transcribe',
-		name: 'audioTranscribe',
+		displayName: 'Transcribe Audio',
+		name: 'transcribeAudio',
 		group: ['transform'],
 		version: 1,
 		description: 'Transcribe audio',
+		subtitle: '={{ $parameter["operation"] + ": " + $parameter["model"] }}',
+		icon: { light: 'file:AudioTranscribe.light.svg', dark: 'file:AudioTranscribe.dark.svg' },
 		defaults: {
-			name: 'Transcribe Audio (JS)',
+			name: 'Transcribe Audio',
 		},
 		inputs: [NodeConnectionType.Main],
 		outputs: [NodeConnectionType.Main],

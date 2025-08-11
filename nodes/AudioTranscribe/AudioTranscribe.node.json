@@ -1,0 +1,34 @@
+{
+	"node": "n8n-nodes-base.transcribeAudio",
+	"nodeVersion": "1.1",
+	"codexVersion": "1.1",
+	"categories": ["Utility"],
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/dioveath/n8n-nodes-transcribe-audio"
+			}
+		]
+	},
+	"alias": [
+                "audio",
+                "media",
+                "extract",
+                "aac",
+                "mp3",
+                "ogg",
+                "flac",
+                "wav",
+                "transcribe audio",
+                "transcribe",
+                "audio",
+                "transcription",
+                "subtitles",
+                "captions",
+                "speech-to-text",
+                "asr",
+                "huggingface",
+                "transformers.js",
+                "whisper"               
+	]
+}
