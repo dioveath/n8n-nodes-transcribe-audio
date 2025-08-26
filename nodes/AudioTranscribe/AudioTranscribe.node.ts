@@ -8,9 +8,12 @@ import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
 
 import { WaveFile } from 'wavefile';
 import { pipeline, env } from '@huggingface/transformers';
-
 import path from 'path'
+import * as _ort from 'onnxruntime-web';
+
 const wasmDir = path.dirname(require.resolve('onnxruntime-web'));
+
+console.log("wasmDir: "+ wasmDir)
 
 if (env.backends.onnx.wasm) {
 	env.backends.onnx.wasm.wasmPaths = wasmDir + path.sep;
