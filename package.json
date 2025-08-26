@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-transcribe-audio",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "description": "Perform speech-to-text on audio files within your n8n workflows.This node provides local audio transcription, no internet or third-party APIs required for processing.",
   "keywords": [
     "n8n-community-node-package",
@@ -76,5 +76,8 @@
     "overrides": {
       "onnxruntime-node": "npm:onnxruntime-web@^1.22.0"
     }
-  }
+  },
+  "overrides": {
+    "onnxruntime-node": "npm:onnxruntime-web@^1.22.0"
+  }  
 }
