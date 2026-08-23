@@ -40,8 +40,8 @@ jobs:
       - name: Build
         run: pnpm run build
 
-  alpine-smoke:
-    name: Alpine WASM smoke test
+  community-install:
+    name: Community install on Alpine
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -54,5 +54,5 @@ jobs:
         with:
           node-version: '24.x'
 
-      - name: Build and test the package on Alpine
-        run: npm run test:alpine
+      - name: Install through n8n and test WASM inference
+        run: npm run test:community

@@ -32,8 +32,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Alpine smoke test
-        run: pnpm run test:alpine
+      - name: Run community installation test
+        run: pnpm run test:community
 
       - name: Publish with provenance
         run: pnpm run release

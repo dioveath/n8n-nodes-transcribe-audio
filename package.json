@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-transcribe-audio",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Perform local speech-to-text on audio files in n8n using Whisper and a portable WebAssembly runtime.",
   "keywords": [
     "n8n-community-node-package",
@@ -42,8 +42,8 @@
     "format": "prettier nodes tests --write",
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
-    "test": "pnpm run test:alpine",
-    "test:alpine": "docker build --file tests/alpine/Dockerfile --tag n8n-nodes-transcribe-audio:test-alpine . && docker run --rm n8n-nodes-transcribe-audio:test-alpine",
+    "test": "pnpm run test:community",
+    "test:community": "docker build --file tests/alpine/Dockerfile --tag n8n-nodes-transcribe-audio:test-community . && docker run --rm n8n-nodes-transcribe-audio:test-community",
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease",
     "deploy": "pnpm run build && docker compose up"
@@ -71,8 +71,8 @@
     "n8n-workflow": "*"
   },
   "dependencies": {
-    "@huggingface/transformers": "4.2.0",
     "onnxruntime-node": "npm:onnxruntime-web@1.24.3",
+    "transformers-wasm": "npm:@huggingface/transformers@4.2.0",
     "wavefile": "^11.0.0"
   }
 }

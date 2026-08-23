@@ -16,7 +16,7 @@ Audio is processed locally. An internet connection is required the first time ea
 
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation. This package uses local runtime dependencies and is intended for self-hosted n8n.
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) and install `n8n-nodes-transcribe-audio` from **Settings → Community Nodes**. Do not copy the compiled files into n8n manually; the Community Nodes installer must install the package's isolated WASM dependencies. This package is intended for self-hosted n8n.
 
 ## Operations
 
@@ -40,7 +40,7 @@ This node does not require any credentials.
 
 ## Compatibility and requirements
 
-- **n8n**: Designed for current self-hosted n8n 2.x releases. The packaged node is tested with n8n 2.35.7 on its stock Alpine 3.24 / Node.js 24.18.1 image.
+- **n8n**: Designed for current self-hosted n8n 2.x releases. The packed release is tested end to end through the Community Nodes HTTP installer on the stock n8n 2.34.5 Alpine 3.24 / Node.js 24.18 image.
 - **Node.js**: Requires Node.js `>=22.22`, matching the current n8n runtime requirement.
 - **Official Docker image**: Supports the stock Alpine/musl-based `n8nio/n8n` image. No glibc compatibility layer or custom image is required.
 - **Inference backend**: CPU-only ONNX Runtime WASM. This is more portable but slower than native `onnxruntime-node` on glibc-based Linux.

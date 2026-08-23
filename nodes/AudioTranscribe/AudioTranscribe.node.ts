@@ -6,13 +6,15 @@ import type {
 } from 'n8n-workflow';
 import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
-import { env, pipeline } from '@huggingface/transformers';
+import { env, pipeline } from 'transformers-wasm';
 import path from 'node:path';
 import { WaveFile } from 'wavefile';
 
 // n8n's official image uses Alpine/musl, which is incompatible with the glibc
-// binaries shipped by onnxruntime-node. package.json aliases that dependency to
-// onnxruntime-web, so inference remains local while using its portable WASM backend.
+// binaries shipped by onnxruntime-node. Both Transformers.js and ONNX Runtime use
+// package aliases so inference remains local on the portable WASM backend. The
+// unique Transformers.js alias also avoids stale module-resolution cache entries
+// left by pre-0.2.0 installations that failed while loading the native backend.
 const wasmDirectory = path.dirname(require.resolve('onnxruntime-node'));
 if (env.backends.onnx.wasm) {
 	env.backends.onnx.wasm.wasmPaths = `${wasmDirectory}${path.sep}`;
