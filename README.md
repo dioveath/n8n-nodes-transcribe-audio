@@ -13,11 +13,12 @@ Audio is processed locally. An internet connection is required the first time ea
 [Compatibility](#compatibility)  
 [Usage](#usage)
 [Testing](#testing)
+[Release process](#release-process)
 [Resources](#resources)  
 
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation. This package uses local runtime dependencies and is intended for self-hosted n8n.
 
 ## Operations
 
@@ -64,6 +65,16 @@ pnpm test
 ```
 
 The test builds the publishable package in Alpine, installs it into a clean Alpine container, loads the compiled n8n node, and runs a small ONNX model through the WASM backend. It does not download a Whisper model.
+
+## Release process
+
+Releases are published by `.github/workflows/publish.yml` with npm provenance. Configure this repository as an npm Trusted Publisher, then run:
+
+```sh
+pnpm release
+```
+
+The n8n CLI validates and builds the package, updates the changelog, creates the release commit and tag, and pushes them. The pushed tag runs the Alpine smoke test before GitHub Actions publishes to npm. Direct local `npm publish` and `pnpm publish` are intentionally blocked.
 
 ## Resources
 

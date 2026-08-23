@@ -24,7 +24,12 @@ function findPackageJson(entryPath) {
 }
 
 test('the packaged node runs ONNX inference through WASM on Alpine', async (context) => {
-	assert.ok(fs.existsSync('/etc/alpine-release'), 'the smoke test must run on Alpine');
+	const runtimeReport = process.report.getReport();
+	assert.equal(
+		runtimeReport.header.glibcVersionRuntime,
+		undefined,
+		'the smoke test must run on a musl-based Linux image',
+	);
 
 	const packageJsonPath = require.resolve('n8n-nodes-transcribe-audio/package.json');
 	const packageRoot = path.dirname(packageJsonPath);

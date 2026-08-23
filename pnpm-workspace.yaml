@@ -1,1 +1,13 @@
-"nodeLinker": "hoisted"
+nodeLinker: hoisted
+
+overrides:
+  onnxruntime-node: npm:onnxruntime-web@1.24.3
+
+allowBuilds:
+  cpu-features: false
+  eslint-plugin-n8n-nodes-base: false
+  isolated-vm: false
+  protobufjs: false
+  sharp: false
+  ssh2: false
+  unrs-resolver: false

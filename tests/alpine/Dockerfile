@@ -7,18 +7,18 @@ FROM node:${NODE_VERSION}-alpine AS package-builder
 WORKDIR /source
 ENV CI=true
 
-RUN npm install --global pnpm@10.11.0
+RUN npm install --global pnpm@11.22.0
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
-COPY .eslintrc.js .eslintrc.prepublish.js .npmignore ./
-COPY gulpfile.js index.js tsconfig.json README.md LICENSE.md ./
-COPY credentials ./credentials
+COPY eslint.config.mjs .npmignore .prettierrc.js ./
+COPY tsconfig.json README.md LICENSE.md ./
 COPY nodes ./nodes
 
-RUN pnpm run prepublishOnly \
-    && pnpm pack --pack-destination /package
+RUN pnpm run lint \
+    && pnpm run build \
+    && RELEASE_MODE=true pnpm pack --pack-destination /package
 
 FROM node:${NODE_VERSION}-alpine AS alpine-test
 

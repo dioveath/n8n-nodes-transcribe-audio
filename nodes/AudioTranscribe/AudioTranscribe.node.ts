@@ -56,9 +56,9 @@ export class AudioTranscribe implements INodeType {
 						value: 'transcribe',
 						description: 'Transcribe audio',
 						action: 'Transcribe audio',
-					}
+					},
 				],
-				default: "transcribe",
+				default: 'transcribe',
 			},
 			{
 				displayName: 'Audio Input Type',
@@ -69,7 +69,7 @@ export class AudioTranscribe implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['transcribe'],
-					}
+					},
 				},
 				options: [
 					{
@@ -77,7 +77,7 @@ export class AudioTranscribe implements INodeType {
 						value: 'binaryFile',
 						description: 'Transcribes audio from a binary file',
 						action: 'Transcribes audio from a binary file',
-					}
+					},
 				],
 				default: 'binaryFile',
 			},
@@ -91,7 +91,7 @@ export class AudioTranscribe implements INodeType {
 					show: {
 						operation: ['transcribe'],
 						audioInputType: ['binaryFile'],
-					}
+					},
 				},
 				default: 'data',
 			},
@@ -104,16 +104,16 @@ export class AudioTranscribe implements INodeType {
 				displayOptions: {
 					show: {
 						operation: ['transcribe'],
-					}
+					},
 				},
-				options: MODELS_LIST.map(model => ({
+				options: MODELS_LIST.map((model) => ({
 					name: model,
 					value: model,
 					description: model,
 					action: `Transcribes audio from a binary file with ${model}`,
 				})),
-				default: ''
-			}
+				default: '',
+			},
 		],
 	};
 
@@ -139,7 +139,9 @@ export class AudioTranscribe implements INodeType {
 				if (operation === 'transcribe') {
 					if (audioInputType === 'binaryFile') {
 						if (item.binary === undefined) {
-							throw new NodeOperationError(this.getNode(), `No binary data found on item!`, { itemIndex });
+							throw new NodeOperationError(this.getNode(), `No binary data found on item!`, {
+								itemIndex,
+							});
 						}
 
 						this.logger.info(`Attempting to load model: "${model}" for item index ${itemIndex}`);
@@ -188,7 +190,7 @@ export class AudioTranscribe implements INodeType {
 						// 			.on('data', (data: Uint8Array) => {
 						// 				chunks.push(data);
 						// 			});
-						// 	})							
+						// 	})
 						// } else {
 						// 	this.logger.info(`Input (item ${itemIndex}, mime: ${mimeType}, ext: ${fileExtension}) assumed to be WAV. Using directly.`);
 						// 	audioBufferWav = buffer;
@@ -212,18 +214,17 @@ export class AudioTranscribe implements INodeType {
 							audioData = samples;
 						}
 
-						this.logger.info(`Starting transcription for item index ${itemIndex}`)
-						let start = performance.now()
-						let result = await transcriber(audioData, { chunk_length_s: 30, stride_length_s: 5 })
-						let end = performance.now()
-						this.logger.info(`Transcription took ${end - start}ms`)
+						this.logger.info(`Starting transcription for item index ${itemIndex}`);
+						const start = performance.now();
+						const result = await transcriber(audioData, { chunk_length_s: 30, stride_length_s: 5 });
+						const end = performance.now();
+						this.logger.info(`Transcription took ${end - start}ms`);
 
 						const newItem = { ...item, json: { ...item.json } };
 						newItem.json.transcription = result;
-						returnData.push(newItem)
+						returnData.push(newItem);
 					}
 				}
-
 			} catch (error) {
 				if (this.continueOnFail()) {
 					const errorItem = {
@@ -233,16 +234,11 @@ export class AudioTranscribe implements INodeType {
 					};
 					returnData.push(errorItem);
 				} else {
-					if (error.context) {
-						error.context.itemIndex = itemIndex;
-						throw error;
-					}
 					throw new NodeOperationError(this.getNode(), error, {
 						itemIndex,
 					});
 				}
 			}
-
 		}
 
 		return this.prepareOutputData(returnData);
