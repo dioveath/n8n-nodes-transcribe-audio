@@ -12,8 +12,6 @@ Audio is processed locally. An internet connection is required the first time ea
 [Credentials](#credentials)
 [Compatibility](#compatibility)  
 [Usage](#usage)
-[Testing](#testing)
-[Release process](#release-process)
 [Resources](#resources)  
 
 ## Installation
@@ -55,26 +53,6 @@ This node does not require any credentials.
 2.  **Binary Property Name**: Specify the name of the binary property containing the audio data if it's not `data`.
 3.  **Model Selection**: Choose the desired Whisper model for transcription.
 4.  **Output**: The node will output the transcribed text in `json.transcription` and potentially other related information.
-
-## Testing
-
-Run the Alpine compatibility smoke test with Docker:
-
-```sh
-pnpm test
-```
-
-The test builds the publishable package in Alpine, installs it into a clean Alpine container, loads the compiled n8n node, and runs a small ONNX model through the WASM backend. It does not download a Whisper model.
-
-## Release process
-
-Releases are published by `.github/workflows/publish.yml` with npm provenance. Configure this repository as an npm Trusted Publisher, then run:
-
-```sh
-pnpm release
-```
-
-The n8n CLI validates and builds the package, updates the changelog, creates the release commit and tag, and pushes them. The pushed tag runs the Alpine smoke test before GitHub Actions publishes to npm. Direct local `npm publish` and `pnpm publish` are intentionally blocked.
 
 ## Resources
 
