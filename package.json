@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-transcribe-audio",
-  "version": "0.1.23",
-  "description": "Perform speech-to-text on audio files within your n8n workflows.This node provides local audio transcription, no internet or third-party APIs required for processing.",
+  "version": "0.2.0",
+  "description": "Perform local speech-to-text on audio files in n8n using Whisper and a portable WebAssembly runtime.",
   "keywords": [
     "n8n-community-node-package",
     "transcribe audio",
@@ -15,8 +15,7 @@
     "huggingface",
     "transformers.js",
     "whisper",
-    "ffmpeg",
-    "mp3",
+    "wasm",
     "wav"
   ],
   "license": "MIT",
@@ -33,7 +32,7 @@
     "url": "https://github.com/dioveath/n8n-nodes-transcribe-audio.git"
   },
   "engines": {
-    "node": ">=20.15"
+    "node": ">=22.22"
   },
   "main": "index.js",
   "packageManager": "pnpm@10.11.0",
@@ -61,26 +60,24 @@
     "eslint": "^8.57.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
+    "n8n-workflow": "2.16.0",
     "prettier": "^3.5.3",
-    "typescript": "^5.8.2"
+    "typescript": "~5.8.2"
   },
   "peerDependencies": {
     "n8n-workflow": "*"
   },
   "dependencies": {
-    "@huggingface/transformers": "^3.7.1",
-    "onnxruntime-web": "^1.22.0",
+    "@huggingface/transformers": "4.2.0",
+    "onnxruntime-node": "npm:onnxruntime-web@1.24.3",
     "wavefile": "^11.0.0"
   },
-  "bundleDependencies": [
-    "onnxruntime-web"
-  ],
   "overrides": {
-    "onnxruntime-node": "npm:onnxruntime-web@^1.22.0"
+    "onnxruntime-node": "npm:onnxruntime-web@1.24.3"
   },
   "pnpm": {
     "overrides": {
-      "onnxruntime-node": "npm:onnxruntime-web@^1.22.0"
+      "onnxruntime-node": "npm:onnxruntime-web@1.24.3"
     }
   }
 }

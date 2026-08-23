@@ -1,8 +1,8 @@
 # n8n-nodes-transcribe-audio
 
-This is an n8n community node. It lets you perform speech-to-text on audio files within your n8n workflows. This node provides local audio transcription; no internet or third-party APIs are required for processing.
+This is an n8n community node for local speech-to-text with Whisper. Inference runs inside the n8n process through Hugging Face Transformers.js and ONNX Runtime WebAssembly (WASM).
 
-It utilizes Hugging Face Transformers.js and Whisper models to transcribe audio.
+Audio is processed locally. An internet connection is required the first time each model is downloaded from Hugging Face; cached models can then be used offline.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -20,7 +20,9 @@ Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes
 
 ## Operations
 
-- **Transcribe**: Takes an audio file (binary input) and returns the transcribed text. It can handle various audio formats (e.g., MP3, WAV) by converting them to the required WAV format (16kHz, 16-bit PCM, mono) using FFmpeg.
+- **Transcribe**: Takes a WAV file from an n8n binary property, resamples it to 16 kHz, mixes multichannel audio to mono, and returns the Whisper transcription.
+
+The current release accepts WAV input. Convert MP3, M4A, OGG, and other formats to WAV in an earlier workflow step.
 
 ## Models
 
@@ -36,10 +38,14 @@ Larger models generally provide better accuracy but require more processing powe
 
 This node does not require any credentials.
 
-## Compatibility
+## Compatibility and requirements
 
-- **n8n Version**: Tested with n8n versions `1.0.0` and above.
-- **Node.js Version**: Requires Node.js version `>=20.15` as specified in the `package.json`.
+- **n8n**: Designed for current self-hosted n8n 2.x releases. The packaged node is tested with n8n 2.35.7 on its stock Alpine 3.24 / Node.js 24.18.1 image.
+- **Node.js**: Requires Node.js `>=22.22`, matching the current n8n runtime requirement.
+- **Official Docker image**: Supports the stock Alpine/musl-based `n8nio/n8n` image. No glibc compatibility layer or custom image is required.
+- **Inference backend**: CPU-only ONNX Runtime WASM. This is more portable but slower than native `onnxruntime-node` on glibc-based Linux.
+- **Memory**: Whisper models are memory-intensive. Start with `whisper-tiny.en` or `whisper-base.en`; larger models may require substantially more container memory.
+- **Network/storage**: The first execution downloads the selected quantized model. Persist the n8n user directory so the model cache survives container recreation.
 
 ## Usage
 
@@ -48,12 +54,9 @@ This node does not require any credentials.
 3.  **Model Selection**: Choose the desired Whisper model for transcription.
 4.  **Output**: The node will output the transcribed text in `json.transcription` and potentially other related information.
 
-Ensure FFmpeg is installed and accessible in your n8n environment if you plan to process audio formats other than WAV, as the node relies on it for audio conversion.
-
 ## Resources
 
 * [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
 * [Hugging Face Transformers.js](https://huggingface.co/docs/transformers.js)
 * [Xenova Whisper Models on Hugging Face](https://huggingface.co/Xenova?search_models=whisper)
-* [ffmpeg](https://ffmpeg.org/)
 * [Project Repository](https://github.com/dioveath/n8n-nodes-transcribe-audio)

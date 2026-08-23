@@ -7,6 +7,10 @@ services:
       - N8N_SECURE_COOKIE=false
       - N8N_DEFAULT_BINARY_DATA_MODE=filesystem
       - N8N_PORT=5000
+      - N8N_RUNNERS_ENABLED=true
+      - N8N_RUNNERS_MODE=internal
+      - NODE_OPTIONS=--max-old-space-size=4096
+
     ports:
       - 5000:5000
     volumes:

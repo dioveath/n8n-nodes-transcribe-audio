@@ -10,3 +10,7 @@ yarn.lock
 .env
 data
 *.tgz
+
+test-my-transformer-package/
+test-server/
+test-xenova-alpine/

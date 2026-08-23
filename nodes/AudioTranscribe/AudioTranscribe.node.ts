@@ -4,19 +4,20 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 
+import { env, pipeline } from '@huggingface/transformers';
+import path from 'node:path';
 import { WaveFile } from 'wavefile';
-import { pipeline, env } from '@huggingface/transformers';
-import path from 'path'
-import * as _ort from 'onnxruntime-web';
 
-const wasmDir = path.dirname(require.resolve('onnxruntime-web'));
-
-console.log("wasmDir: "+ wasmDir)
-
+// n8n's official image uses Alpine/musl, which is incompatible with the glibc
+// binaries shipped by onnxruntime-node. package.json aliases that dependency to
+// onnxruntime-web, so inference remains local while using its portable WASM backend.
+const wasmDirectory = path.dirname(require.resolve('onnxruntime-node'));
 if (env.backends.onnx.wasm) {
-	env.backends.onnx.wasm.wasmPaths = wasmDir + path.sep;
+	env.backends.onnx.wasm.wasmPaths = `${wasmDirectory}${path.sep}`;
+	env.backends.onnx.wasm.numThreads = 1;
+	env.backends.onnx.wasm.proxy = false;
 }
 
 const MODELS_LIST = [
@@ -39,8 +40,8 @@ export class AudioTranscribe implements INodeType {
 		defaults: {
 			name: 'Transcribe Audio',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		usableAsTool: true,
 		properties: [
 			{
@@ -143,7 +144,9 @@ export class AudioTranscribe implements INodeType {
 
 						this.logger.info(`Attempting to load model: "${model}" for item index ${itemIndex}`);
 						const transcriber = await pipeline('automatic-speech-recognition', model, {
-							progress_callback: (_progress: any) => { },
+							device: 'cpu',
+							dtype: 'q8',
+							progress_callback: () => {},
 						});
 						this.logger.info(`Model "${model}" loaded successfully for item index ${itemIndex}`);
 
@@ -195,15 +198,18 @@ export class AudioTranscribe implements INodeType {
 						wav.toBitDepth('32f'); // pipeline expects input as a Float32Array
 						wav.toSampleRate(16000); // pipeline expects input at 16kHz
 
-						let audioData = wav.getSamples();
-						if (Array.isArray(audioData)) {
-							if (audioData.length > 0) {
-								const SCALING_FACTOR = Math.sqrt(2);
-								for (let i = 0; i < audioData.length; i++) {
-									audioData[0][i] = SCALING_FACTOR * (audioData[0][i] + audioData[1][i]) / 2;
+						const samples = wav.getSamples() as Float64Array | Float64Array[];
+						let audioData: Float64Array;
+						if (Array.isArray(samples)) {
+							const sampleCount = samples[0]?.length ?? 0;
+							audioData = new Float64Array(sampleCount);
+							for (const channel of samples) {
+								for (let sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
+									audioData[sampleIndex] += channel[sampleIndex] / samples.length;
 								}
 							}
-							audioData = audioData[0]
+						} else {
+							audioData = samples;
 						}
 
 						this.logger.info(`Starting transcription for item index ${itemIndex}`)
