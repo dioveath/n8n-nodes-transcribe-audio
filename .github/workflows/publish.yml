@@ -30,6 +30,9 @@ jobs:
       - name: Build package
         run: pnpm run build --if-present
 
+      - name: Run Alpine smoke test
+        run: pnpm run test:alpine
+
       - name: Publish to npm with provenance
         run: pnpm publish --provenance --no-git-checks
         env:

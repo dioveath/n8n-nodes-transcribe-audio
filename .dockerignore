@@ -1,0 +1,14 @@
+.git
+node_modules
+dist
+data
+.tmp
+tmp
+.env
+*.tgz
+npm-debug.log*
+.vscode
+
+test-my-transformer-package
+test-server
+test-xenova-alpine

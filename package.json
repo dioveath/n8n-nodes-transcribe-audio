@@ -42,6 +42,8 @@
     "format": "prettier nodes --write",
     "lint": "eslint nodes package.json",
     "lintfix": "eslint nodes package.json --fix",
+    "test": "pnpm run test:alpine",
+    "test:alpine": "docker build --file tests/alpine/Dockerfile --tag n8n-nodes-transcribe-audio:test-alpine . && docker run --rm n8n-nodes-transcribe-audio:test-alpine",
     "prepublishOnly": "pnpm run build && pnpm run lint -c .eslintrc.prepublish.js nodes package.json",
     "deploy": "tsc && gulp build:icons && docker compose up"
   },
