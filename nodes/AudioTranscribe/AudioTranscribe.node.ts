@@ -140,10 +140,25 @@ export class AudioTranscribe implements INodeType {
 
 				if (operation === 'transcribe') {
 					if (audioInputType === 'binaryFile') {
-						if (item.binary === undefined) {
-							throw new NodeOperationError(this.getNode(), `No binary data found on item!`, {
-								itemIndex,
-							});
+						const availableBinaryProperties = Object.keys(item.binary ?? {});
+						if (!item.binary?.[binaryPropertyName]) {
+							if (availableBinaryProperties.length === 1) {
+								const detectedBinaryProperty = availableBinaryProperties[0];
+								this.logger.warn(
+									`Binary property "${binaryPropertyName}" was not found on item ${itemIndex}; using the only available property, "${detectedBinaryProperty}"`,
+								);
+								binaryPropertyName = detectedBinaryProperty;
+							} else {
+								const availableProperties =
+									availableBinaryProperties.length === 0
+										? 'none'
+										: availableBinaryProperties.map((property) => `"${property}"`).join(', ');
+								throw new NodeOperationError(
+									this.getNode(),
+									`Binary property "${binaryPropertyName}" was not found. Available binary properties: ${availableProperties}`,
+									{ itemIndex },
+								);
+							}
 						}
 
 						this.logger.info(`Attempting to load model: "${model}" for item index ${itemIndex}`);
