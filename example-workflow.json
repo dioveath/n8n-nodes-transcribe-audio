@@ -1,0 +1,58 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Transcription",
+        "formDescription": "To transcribe",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Audio",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "4ea7cf70-391c-47c6-a047-0bd4763e6a0d",
+      "name": "On form submission",
+      "webhookId": "e8017472-31e4-4e4c-b383-d9282a9ae5a7"
+    },
+    {
+      "parameters": {
+        "model": "Xenova/whisper-tiny.en"
+      },
+      "type": "n8n-nodes-transcribe-audio.audioTranscribe",
+      "typeVersion": 1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "0528a6f8-f9b6-4e81-8965-9058b865a1cc",
+      "name": "Transcribe Audio"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Transcribe Audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "d3312e56bab30d56913ce75d74725bafad29a24c75674669542ccecd72c68bde"
+  }
+}

@@ -12,23 +12,17 @@
 	},
 	"alias": [
 		"audio",
-		"media",
-		"extract",
-		"aac",
 		"mp3",
-		"ogg",
-		"flac",
 		"wav",
-		"transcribe audio",
 		"transcribe",
-		"audio",
 		"transcription",
+		"speech to text",
+		"voice notes",
+		"meeting notes",
+		"podcast",
+		"interview",
 		"subtitles",
 		"captions",
-		"speech-to-text",
-		"asr",
-		"huggingface",
-		"transformers.js",
 		"whisper"
 	]
 }

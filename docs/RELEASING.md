@@ -71,7 +71,7 @@ This package intentionally has runtime dependencies for local Whisper inference.
 Run this only after reviewing a clean working tree:
 
 ```sh
-pnpm run release
+GITHUB_TOKEN="$(gh auth token)" pnpm run release
 ```
 
 When run locally, `n8n-node release` updates the version, commits, tags, pushes, and creates the GitHub release. The pushed version tag starts `.github/workflows/publish.yml`, which tests the packed package again and publishes it to npm with provenance.
@@ -91,27 +91,26 @@ npx --yes @n8n/scan-community-package n8n-nodes-transcribe-audio@latest
 
 The provenance check should pass. The scanner's runtime-dependency errors are expected while this package remains self-hosted only.
 
-## 8. Deprecate unsafe old releases
+## 8. Check deprecated releases
 
-This is a one-time public registry change. It needs an npm login with owner access:
+Only the latest release should remain active. This registry change needs an npm login with owner access:
 
 ```sh
 npm login
 npm whoami
-npm deprecate 'n8n-nodes-transcribe-audio@<0.2.1' \
-  'Alpine installs may fail because these releases can load native ONNX. Upgrade to 0.2.1 or newer.'
+latest=$(npm view n8n-nodes-transcribe-audio@latest version)
+npm deprecate "n8n-nodes-transcribe-audio@<$latest" \
+  "This version is outdated. Upgrade to $latest for latest support."
 ```
 
 Check the result:
 
 ```sh
-for version in 0.1.0 0.1.1 0.1.21 0.1.22 0.1.23 0.2.0 0.2.1; do
-  printf '%s: ' "$version"
-  npm view "n8n-nodes-transcribe-audio@$version" deprecated
-done
+npm view n8n-nodes-transcribe-audio versions --json
+npm view n8n-nodes-transcribe-audio@latest deprecated
 ```
 
-Version 0.2.1 and newer must not show a deprecation message.
+Every older version should show the upgrade message. The latest version must not show a deprecation message.
 
 ## 9. Recovery
 

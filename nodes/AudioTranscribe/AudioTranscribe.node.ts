@@ -125,8 +125,8 @@ export class AudioTranscribe implements INodeType {
 		name: 'audioTranscribe',
 		group: ['transform'],
 		version: 1,
-		description: 'Transcribe audio',
-		subtitle: '={{ $parameter["operation"] + ": " + $parameter["model"] }}',
+		description: 'Turn English speech in WAV or MP3 files into text',
+		subtitle: '={{ $parameter["model"] }}',
 		icon: { light: 'file:AudioTranscribe.light.svg', dark: 'file:AudioTranscribe.dark.svg' },
 		defaults: {
 			name: 'Transcribe Audio',
@@ -139,14 +139,14 @@ export class AudioTranscribe implements INodeType {
 				displayName: 'Operation',
 				name: 'operation',
 				type: 'options',
-				description: 'The description text',
+				description: 'Turn speech in an audio file into text',
 				noDataExpression: true,
 				options: [
 					{
 						name: 'Transcribe',
 						value: 'transcribe',
-						description: 'Transcribe audio',
-						action: 'Transcribe audio',
+						description: 'Turn speech in a WAV or MP3 file into text',
+						action: 'Transcribe an audio file',
 					},
 				],
 				default: 'transcribe',
@@ -155,7 +155,7 @@ export class AudioTranscribe implements INodeType {
 				displayName: 'Audio Input Type',
 				name: 'audioInputType',
 				type: 'options',
-				description: 'The description text',
+				description: 'Choose how the audio enters this node',
 				noDataExpression: true,
 				displayOptions: {
 					show: {
@@ -166,8 +166,8 @@ export class AudioTranscribe implements INodeType {
 					{
 						name: 'Binary File',
 						value: 'binaryFile',
-						description: 'Transcribes audio from a binary file',
-						action: 'Transcribes audio from a binary file',
+						description: 'Use a WAV or MP3 file from the incoming item',
+						action: 'Transcribe an incoming audio file',
 					},
 				],
 				default: 'binaryFile',
@@ -176,7 +176,7 @@ export class AudioTranscribe implements INodeType {
 				displayName: 'Binary Property Name',
 				name: 'binaryPropertyName',
 				type: 'string',
-				description: 'The name of the binary property to use for transcription',
+				description: 'Name of the incoming field that contains the WAV or MP3 file',
 				required: true,
 				displayOptions: {
 					show: {
@@ -190,7 +190,7 @@ export class AudioTranscribe implements INodeType {
 				displayName: 'Model',
 				name: 'model',
 				type: 'options',
-				description: 'The model to use for transcription',
+				description: 'Speech model to use; smaller models are faster and use less memory',
 				noDataExpression: true,
 				displayOptions: {
 					show: {

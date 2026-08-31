@@ -1,96 +1,128 @@
-# n8n-nodes-transcribe-audio
+# Transcribe Audio for n8n
 
-This is an n8n community node for local speech-to-text with Whisper. Inference runs inside the n8n process through Hugging Face Transformers.js and ONNX Runtime WebAssembly (WASM).
+Turn English speech in WAV and MP3 files into text inside your self-hosted n8n instance. No transcription API key is required, and your audio is not sent to a third-party transcription service.
 
-Audio is processed locally. An internet connection is required the first time each model is downloaded from Hugging Face; cached models can then be used offline.
+## What you can build
 
-[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
+- Turn meeting recordings into notes
+- Transcribe voice messages and form uploads
+- Extract text from interviews and podcasts
+- Prepare audio for summaries, search, subtitles, or AI workflows
+- Process private recordings on your own n8n server
 
-- [Installation](#installation)
-- [Updating an old installation](#updating-an-old-installation)
-- [Operations](#operations)
-- [Models](#models)
-- [Credentials](#credentials)
-- [Compatibility](#compatibility-and-requirements)
-- [Usage](#usage)
-- [Troubleshooting](#troubleshooting)
-- [Resources](#resources)
+## Before you install
+
+- This community node is for **self-hosted n8n**. It is not available on n8n Cloud.
+- It supports **WAV and MP3** files with English speech.
+- The first run downloads the selected speech model, so your n8n server needs internet access.
+- Transcription runs on your server's CPU. Longer recordings and larger models take more time and memory.
 
 ## Installation
 
-Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) and install `n8n-nodes-transcribe-audio` from **Settings → Community Nodes**.
+1. In n8n, open **Settings → Community Nodes**.
+2. Select **Install a community node**.
+3. Enter:
 
-- Install version **0.2.1 or newer**. Versions through 0.2.0 can load a native ONNX library that does not work on Alpine Linux.
-- Do not copy `dist` or `node_modules` into n8n manually. The Community Nodes installer must install the package's isolated WASM dependencies.
-- This package is for self-hosted n8n. It has runtime dependencies, so it is not eligible for n8n Cloud verification under the current community-package rules.
-- If your n8n instance blocks unverified packages, set `N8N_UNVERIFIED_PACKAGES_ENABLED=true` and restart n8n before installing.
+   ```text
+   n8n-nodes-transcribe-audio
+   ```
 
-## Updating an old installation
+4. Accept the community-node warning and install it.
+5. Restart n8n if the node does not appear immediately.
 
-1. Back up the persisted n8n user directory.
-2. Update n8n to a release that uses Node.js 22.22 or newer.
-3. Update this package to version 0.2.1 or newer from **Settings → Community Nodes**.
-4. Restart n8n after the update.
+If your self-hosted instance blocks unverified community nodes, add this environment variable and restart n8n:
 
-Version 0.2.1 uses a new Transformers.js package alias so a running n8n process cannot reuse the native ONNX module path cached by versions through 0.2.0.
+```text
+N8N_UNVERIFIED_PACKAGES_ENABLED=true
+```
 
-## Operations
+## Quick start
 
-- **Transcribe**: Takes a WAV or MP3 file from an n8n binary property, decodes it locally, resamples it to 16 kHz, mixes multichannel audio to mono, and returns the Whisper transcription.
+1. Add a node that produces a WAV or MP3 file, such as a Form Trigger, Webhook, Google Drive, or Read/Write Files from Disk node.
+2. Add **Transcribe Audio** after it.
+3. Enter the binary field that contains the audio. The usual field is `data`. If the incoming item has only one file, the node can detect it automatically.
+4. Choose a model. Start with `Xenova/whisper-tiny.en` for the quickest result.
+5. Run the workflow.
+6. Read the transcript from:
 
-WAV and MP3 decoding work in the stock Alpine image without FFmpeg. Convert M4A, OGG, and other formats to WAV or MP3 in an earlier workflow step.
+   ```text
+   {{$json.transcription.text}}
+   ```
 
-## Models
+Example output:
 
-The node allows you to select from a list of pre-configured Xenova Whisper models:
+```json
+{
+  "transcription": {
+    "text": "Your transcribed speech appears here."
+  }
+}
+```
 
-- `Xenova/whisper-tiny.en`
-- `Xenova/whisper-base.en`
-- `Xenova/whisper-small.en`
-- `Xenova/whisper-medium.en`
+## Choosing a model
 
-Larger models generally provide better accuracy but require more processing power and time.
+| Model | Best for | Trade-off |
+| --- | --- | --- |
+| `Xenova/whisper-tiny.en` | Testing, short clips, and lower-memory servers | Fastest, but less accurate |
+| `Xenova/whisper-base.en` | Everyday voice notes and recordings | Good starting balance |
+| `Xenova/whisper-small.en` | Clearer transcripts when accuracy matters | Slower and uses more memory |
+| `Xenova/whisper-medium.en` | Higher accuracy on capable servers | Slowest and most memory-intensive |
 
-## Credentials
+All available models are English-only. Start small, then move to a larger model only if you need better accuracy.
 
-This node does not require any credentials.
+## Supported input
 
-## Compatibility and requirements
+- WAV
+- MP3
+- Mono or stereo audio
+- Any sample rate; the node prepares the audio automatically
 
-- **n8n**: Designed for current self-hosted n8n 2.x releases. The packed release is tested end to end through the Community Nodes HTTP installer on the stock n8n 2.35.7 Alpine / Node.js 24 image.
-- **Node.js**: Requires Node.js `>=22.22`, matching the current n8n runtime requirement.
-- **Official Docker image**: Supports the stock Alpine/musl-based `n8nio/n8n` image. No glibc compatibility layer or custom image is required.
-- **CPU architecture**: CI runs the package-install and WASM smoke test on Linux x64 and ARM64. Complete Whisper WAV and MP3 tests run on x64.
-- **Inference backend**: CPU-only ONNX Runtime WASM. This is more portable but slower than native `onnxruntime-node` on glibc-based Linux.
-- **Memory**: Whisper models are memory-intensive. Start with `whisper-tiny.en` or `whisper-base.en`; larger models may require substantially more container memory.
-- **Network/storage**: The first execution downloads the selected quantized model. Persist the n8n user directory so the model cache survives container recreation.
+Convert M4A, OGG, AAC, FLAC, and other formats to WAV or MP3 before sending them to this node.
 
-## Usage
+## Privacy and storage
 
-1.  **Input**: Provide an audio file via a binary property (default: `data`).
-2.  **Binary Property Name**: Specify the name of the binary property containing the audio data if it's not `data`.
-3.  **Model Selection**: Choose the desired Whisper model for transcription.
-4.  **Output**: The node will output the transcribed text in `json.transcription` and potentially other related information.
+The recording is processed inside your n8n instance. The node does not upload audio to a transcription API.
+
+On first use, n8n downloads the selected model from Hugging Face and stores it in the n8n user folder. Keep that folder on persistent storage so the model does not need to be downloaded again when the container restarts.
 
 ## Troubleshooting
 
-If installation appears to finish but the node is missing, read the n8n container log:
+### The node does not appear after installation
 
-```sh
-docker logs <your-n8n-container>
-```
+- Confirm that you are using self-hosted n8n, not n8n Cloud.
+- Confirm that `N8N_UNVERIFIED_PACKAGES_ENABLED=true` is set when required by your setup.
+- Restart n8n and check the container logs:
 
-- A `__vsnprintf_chk: symbol not found` or `__sprintf_chk: symbol not found` error means an old native ONNX package was loaded. Update to 0.2.1 or newer and restart n8n.
-- An engine warning means the n8n container's Node.js version is too old. Update n8n instead of forcing the package to install.
-- An unsupported-format error means the input is not WAV or MP3. Convert formats such as M4A and OGG before this node.
-- A model-download error on first use is not an install error. Check container network access and free storage.
-- An out-of-memory error is not an install error. Start with `Xenova/whisper-tiny.en` and give the container more memory if needed.
+  ```sh
+  docker logs <your-n8n-container>
+  ```
 
-Maintainers can find the release and old-version deprecation checklist in [`docs/RELEASING.md`](docs/RELEASING.md).
+### The first run is slow
 
-## Resources
+The first run downloads and opens the selected model. Later runs reuse the saved model and start faster.
 
-- [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-- [Hugging Face Transformers.js](https://huggingface.co/docs/transformers.js)
-- [Xenova Whisper Models on Hugging Face](https://huggingface.co/Xenova?search_models=whisper)
-- [Project Repository](https://github.com/dioveath/n8n-nodes-transcribe-audio)
+### The model cannot be downloaded
+
+Check that the n8n container can reach the internet and has enough free storage. The audio itself stays local; only the model is downloaded.
+
+### The server runs out of memory
+
+Use `Xenova/whisper-tiny.en` or `Xenova/whisper-base.en`, shorten the recording, or give the n8n container more memory.
+
+### The audio format is rejected
+
+Use a WAV or MP3 file. Convert M4A, OGG, AAC, FLAC, and other formats before this node.
+
+### Logs mention `__vsnprintf_chk` or `__sprintf_chk`
+
+An old package version is still installed. Remove it from **Settings → Community Nodes**, install the latest version, and restart n8n.
+
+## Updating
+
+Update the package from **Settings → Community Nodes**, then restart n8n. Back up your n8n user folder before updating your n8n installation.
+
+## Links
+
+- [n8n community-node installation guide](https://docs.n8n.io/integrations/community-nodes/installation/)
+- [Report a problem or request a feature](https://github.com/dioveath/n8n-nodes-transcribe-audio/issues)
+- [Version history](CHANGELOG.md)
