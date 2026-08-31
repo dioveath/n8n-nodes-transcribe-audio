@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-transcribe-audio",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Perform local speech-to-text on audio files in n8n using Whisper and a portable WebAssembly runtime.",
   "keywords": [
     "n8n-community-node-package",
