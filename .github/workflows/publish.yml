@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run community installation and WAV transcription test
+      - name: Run community installation and audio transcription tests
         run: pnpm run test:community
 
       - name: Publish with provenance

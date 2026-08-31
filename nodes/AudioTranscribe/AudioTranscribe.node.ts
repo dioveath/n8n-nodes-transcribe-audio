@@ -4,9 +4,12 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError, UnexpectedError, UserError } from 'n8n-workflow';
 
+// The package alias exposes a CommonJS entry at runtime, but TypeScript resolves its ESM declaration.
+// @ts-expect-error -- n8n loads this node as CommonJS through the alias's require export.
 import { env, pipeline } from 'transformers-wasm';
+import os from 'node:os';
 import path from 'node:path';
 import { WaveFile } from 'wavefile';
 
@@ -20,6 +23,92 @@ if (env.backends.onnx.wasm) {
 	env.backends.onnx.wasm.wasmPaths = `${wasmDirectory}${path.sep}`;
 	env.backends.onnx.wasm.numThreads = 1;
 	env.backends.onnx.wasm.proxy = false;
+}
+
+const n8nUserDirectory = path.join(process.env.N8N_USER_FOLDER ?? os.homedir(), '.n8n');
+env.cacheDir = path.join(n8nUserDirectory, 'models', 'transformers');
+
+const TARGET_SAMPLE_RATE = 16_000;
+type AudioChannel = Float32Array | Float64Array;
+
+function downmixChannels(channels: AudioChannel[]): Float32Array {
+	if (channels.length === 0 || channels[0].length === 0) {
+		throw new UnexpectedError('The audio file does not contain any samples.');
+	}
+
+	const sampleCount = Math.min(...channels.map((channel) => channel.length));
+	const mono = new Float32Array(sampleCount);
+
+	for (const channel of channels) {
+		for (let sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
+			mono[sampleIndex] += channel[sampleIndex] / channels.length;
+		}
+	}
+
+	return mono;
+}
+
+function getWaveSamples(wav: WaveFile): Float32Array {
+	const samples = wav.getSamples() as unknown as Float64Array | Float64Array[];
+	return downmixChannels(Array.isArray(samples) ? samples : [samples]);
+}
+
+function decodeWav(buffer: Buffer): Float32Array {
+	const wav = new WaveFile(buffer);
+	wav.toBitDepth('32f');
+	wav.toSampleRate(TARGET_SAMPLE_RATE);
+	return getWaveSamples(wav);
+}
+
+async function decodeMp3(buffer: Buffer): Promise<Float32Array> {
+	const { default: decode } = await import('@audio/decode-mp3');
+	const { channelData, sampleRate } = await decode(buffer);
+	const mono = downmixChannels(channelData);
+
+	if (sampleRate === TARGET_SAMPLE_RATE) return mono;
+
+	const wav = new WaveFile();
+	wav.fromScratch(1, sampleRate, '32f', mono);
+	wav.toSampleRate(TARGET_SAMPLE_RATE);
+	return getWaveSamples(wav);
+}
+
+async function decodeAudio(
+	buffer: Buffer,
+	fileExtension?: string,
+	mimeType?: string,
+	fileName?: string,
+): Promise<Float32Array> {
+	const extension = fileExtension?.replace(/^\./, '').toLowerCase();
+	const normalizedMimeType = mimeType?.toLowerCase();
+	const header = buffer.subarray(0, 12);
+	const isWavHeader =
+		['RIFF', 'RIFX', 'RF64'].includes(header.toString('ascii', 0, 4)) &&
+		header.toString('ascii', 8, 12) === 'WAVE';
+	const isMp3Header =
+		header.toString('ascii', 0, 3) === 'ID3' ||
+		(header.length >= 2 && header[0] === 0xff && (header[1] & 0xe0) === 0xe0);
+
+	if (
+		isMp3Header ||
+		extension === 'mp3' ||
+		['audio/mpeg', 'audio/mp3'].includes(normalizedMimeType ?? '')
+	) {
+		return decodeMp3(buffer);
+	}
+
+	if (
+		isWavHeader ||
+		extension === 'wav' ||
+		['audio/wav', 'audio/x-wav'].includes(normalizedMimeType ?? '')
+	) {
+		return decodeWav(buffer);
+	}
+
+	const inputDescription = fileName ? ` "${fileName}"` : '';
+	throw new UserError(
+		`Unsupported audio format for file${inputDescription}. Supported formats: WAV and MP3.`,
+	);
 }
 
 const MODELS_LIST = [
@@ -161,6 +250,15 @@ export class AudioTranscribe implements INodeType {
 							}
 						}
 
+						const binaryData = item.binary![binaryPropertyName];
+						const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, binaryPropertyName);
+						const audioData = await decodeAudio(
+							buffer,
+							binaryData.fileExtension,
+							binaryData.mimeType,
+							binaryData.fileName,
+						);
+
 						this.logger.info(`Attempting to load model: "${model}" for item index ${itemIndex}`);
 						const transcriber = await pipeline('automatic-speech-recognition', model, {
 							device: 'cpu',
@@ -168,68 +266,6 @@ export class AudioTranscribe implements INodeType {
 							progress_callback: () => {},
 						});
 						this.logger.info(`Model "${model}" loaded successfully for item index ${itemIndex}`);
-
-						const buffer = await this.helpers.getBinaryDataBuffer(itemIndex, binaryPropertyName);
-
-						// const tempDir = os.tmpdir()
-						// const tempFilePath = path.join(tempDir, `audio_${itemIndex}_${Date.now()}.${binaryData.fileExtension || "wav"}`)
-						// const buffer = Buffer.from(binaryItem.data, 'base64');
-						// let url = 'https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/jfk.wav';
-						// const response = await fetch(url);
-						// const arrayBuffer = await response.arrayBuffer();
-						// const buffer = Buffer.from(new Uint8Array(arrayBuffer));
-
-						// const mimeType = binaryItem.mimeType
-						// const fileExtension = binaryItem.fileExtension
-						// let audioBufferWav: Buffer
-
-						// if (mimeType === 'audio/mpeg' || mimeType === 'audio/mp3' || fileExtension === 'mp3') {
-						// 	const readableMp3Stream = Readable.from(buffer);
-						// 	audioBufferWav = await new Promise<Buffer>((resolve, reject) => {
-						// 		const chunks: Uint8Array[] = [];
-						// 		ffmpeg(readableMp3Stream)
-						// 			.format('wav')
-						// 			.audioCodec('pcm_s16le')
-						// 			.audioFrequency(16000)
-						// 			.audioChannels(1)
-						// 			.on('start', (commnadLine: string) => {
-						// 				this.logger.info(`Conversion started: ${commnadLine}`);
-						// 			})
-						// 			.on('error', (err: Error, stdout: string, stderr: string) => {
-						// 				this.logger.error(`Std out: ${stdout}`);
-						// 				this.logger.error(`Std err: ${stderr}`);
-						// 				reject(new NodeOperationError(this.getNode(), `Conversion failed: ${err.message}`, { itemIndex }));
-						// 			})
-						// 			.on('end', (stdout: string, stderr: string) => {
-						// 				resolve(Buffer.concat(chunks));
-						// 			})
-						// 			.pipe()
-						// 			.on('data', (data: Uint8Array) => {
-						// 				chunks.push(data);
-						// 			});
-						// 	})
-						// } else {
-						// 	this.logger.info(`Input (item ${itemIndex}, mime: ${mimeType}, ext: ${fileExtension}) assumed to be WAV. Using directly.`);
-						// 	audioBufferWav = buffer;
-						// }
-
-						const wav = new WaveFile(buffer);
-						wav.toBitDepth('32f'); // pipeline expects input as a Float32Array
-						wav.toSampleRate(16000); // pipeline expects input at 16kHz
-
-						const samples = wav.getSamples() as Float64Array | Float64Array[];
-						let audioData: Float64Array;
-						if (Array.isArray(samples)) {
-							const sampleCount = samples[0]?.length ?? 0;
-							audioData = new Float64Array(sampleCount);
-							for (const channel of samples) {
-								for (let sampleIndex = 0; sampleIndex < sampleCount; sampleIndex++) {
-									audioData[sampleIndex] += channel[sampleIndex] / samples.length;
-								}
-							}
-						} else {
-							audioData = samples;
-						}
 
 						this.logger.info(`Starting transcription for item index ${itemIndex}`);
 						const start = performance.now();

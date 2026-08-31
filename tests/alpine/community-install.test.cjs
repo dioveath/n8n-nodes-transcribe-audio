@@ -9,7 +9,10 @@ const { spawn } = require('node:child_process');
 const BASE_URL = 'http://127.0.0.1:5678';
 const PACKAGE_NAME = 'n8n-nodes-transcribe-audio';
 const PACKAGE_ROOT = `/home/node/.n8n/nodes/node_modules/${PACKAGE_NAME}`;
-const AUDIO_FIXTURE = '/test/fixtures/jfk-4s.wav';
+const AUDIO_FIXTURES = [
+	{ extension: 'wav', mimeType: 'audio/wav', path: '/test/fixtures/jfk-4s.wav' },
+	{ extension: 'mp3', mimeType: 'audio/mpeg', path: '/test/fixtures/jfk-4s.mp3' },
+];
 const NATIVE_ONNX_MUSL_ERROR = /__(?:vsnprintf|sprintf)_chk: symbol not found/;
 const RUN_TRANSCRIPTION_TEST = process.env.RUN_TRANSCRIPTION_TEST !== 'false';
 const candidateManifest = JSON.parse(fs.readFileSync('/test/candidate-package.json', 'utf8'));
@@ -172,20 +175,18 @@ async function main() {
 
 			const nodeEntry = path.join(PACKAGE_ROOT, candidateManifest.n8n.nodes[0]);
 			const { AudioTranscribe } = packageRequire(nodeEntry);
-			const audioBuffer = fs.readFileSync(AUDIO_FIXTURE);
-			const inputItems = [
-				{
-					json: {},
-					binary: {
-						audio: {
-							data: '',
-							fileExtension: 'wav',
-							fileName: path.basename(AUDIO_FIXTURE),
-							mimeType: 'audio/wav',
-						},
+			const audioBuffers = AUDIO_FIXTURES.map((fixture) => fs.readFileSync(fixture.path));
+			const inputItems = AUDIO_FIXTURES.map((fixture) => ({
+				json: {},
+				binary: {
+					audio: {
+						data: '',
+						fileExtension: fixture.extension,
+						fileName: path.basename(fixture.path),
+						mimeType: fixture.mimeType,
 					},
 				},
-			];
+			}));
 			const parameters = {
 				operation: 'transcribe',
 				audioInputType: 'binaryFile',
@@ -205,9 +206,9 @@ async function main() {
 				}),
 				getNodeParameter: (name) => parameters[name],
 				helpers: {
-					getBinaryDataBuffer: async (_itemIndex, propertyName) => {
+					getBinaryDataBuffer: async (itemIndex, propertyName) => {
 						assert.equal(propertyName, 'audio');
-						return audioBuffer;
+						return audioBuffers[itemIndex];
 					},
 				},
 				logger: {
@@ -220,15 +221,18 @@ async function main() {
 			};
 
 			const transcriptionOutput = await AudioTranscribe.prototype.execute.call(executeContext);
-			const transcription = transcriptionOutput[0][0].json.transcription;
-			assert.equal(typeof transcription.text, 'string');
-			assert.match(transcription.text, /fellow americans/i);
+			assert.equal(transcriptionOutput[0].length, AUDIO_FIXTURES.length);
+			for (const item of transcriptionOutput[0]) {
+				const transcription = item.json.transcription;
+				assert.equal(typeof transcription.text, 'string');
+				assert.match(transcription.text, /fellow americans/i);
+			}
 		}
 
 		console.log(
 			`Community install passed: ${PACKAGE_NAME}@${candidateManifest.version} loaded ` +
 				`${ortManifest.name}@${ortManifest.version}, executed WASM inference` +
-				`${RUN_TRANSCRIPTION_TEST ? ', and transcribed the WAV fixture' : ''}.`,
+				`${RUN_TRANSCRIPTION_TEST ? ', and transcribed the WAV and MP3 fixtures' : ''}.`,
 		);
 	} catch (error) {
 		console.error(output);

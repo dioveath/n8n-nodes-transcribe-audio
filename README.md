@@ -36,9 +36,9 @@ Version 0.2.1 uses a new Transformers.js package alias so a running n8n process 
 
 ## Operations
 
-- **Transcribe**: Takes a WAV file from an n8n binary property, resamples it to 16 kHz, mixes multichannel audio to mono, and returns the Whisper transcription.
+- **Transcribe**: Takes a WAV or MP3 file from an n8n binary property, decodes it locally, resamples it to 16 kHz, mixes multichannel audio to mono, and returns the Whisper transcription.
 
-The current release accepts WAV input. Convert MP3, M4A, OGG, and other formats to WAV in an earlier workflow step.
+WAV and MP3 decoding work in the stock Alpine image without FFmpeg. Convert M4A, OGG, and other formats to WAV or MP3 in an earlier workflow step.
 
 ## Models
 
@@ -60,7 +60,7 @@ This node does not require any credentials.
 - **n8n**: Designed for current self-hosted n8n 2.x releases. The packed release is tested end to end through the Community Nodes HTTP installer on the stock n8n 2.35.7 Alpine / Node.js 24 image.
 - **Node.js**: Requires Node.js `>=22.22`, matching the current n8n runtime requirement.
 - **Official Docker image**: Supports the stock Alpine/musl-based `n8nio/n8n` image. No glibc compatibility layer or custom image is required.
-- **CPU architecture**: CI runs the package-install and WASM smoke test on Linux x64 and ARM64. The complete Whisper WAV test runs on x64.
+- **CPU architecture**: CI runs the package-install and WASM smoke test on Linux x64 and ARM64. Complete Whisper WAV and MP3 tests run on x64.
 - **Inference backend**: CPU-only ONNX Runtime WASM. This is more portable but slower than native `onnxruntime-node` on glibc-based Linux.
 - **Memory**: Whisper models are memory-intensive. Start with `whisper-tiny.en` or `whisper-base.en`; larger models may require substantially more container memory.
 - **Network/storage**: The first execution downloads the selected quantized model. Persist the n8n user directory so the model cache survives container recreation.
@@ -82,6 +82,7 @@ docker logs <your-n8n-container>
 
 - A `__vsnprintf_chk: symbol not found` or `__sprintf_chk: symbol not found` error means an old native ONNX package was loaded. Update to 0.2.1 or newer and restart n8n.
 - An engine warning means the n8n container's Node.js version is too old. Update n8n instead of forcing the package to install.
+- An unsupported-format error means the input is not WAV or MP3. Convert formats such as M4A and OGG before this node.
 - A model-download error on first use is not an install error. Check container network access and free storage.
 - An out-of-memory error is not an install error. Start with `Xenova/whisper-tiny.en` and give the container more memory if needed.
 

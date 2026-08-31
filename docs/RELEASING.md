@@ -40,7 +40,7 @@ pnpm run test:community
 4. Install the candidate through n8n's Community Nodes HTTP endpoint.
 5. Load the n8n node.
 6. Run a small ONNX model through WASM.
-7. Download `Xenova/whisper-tiny.en` and transcribe the WAV fixture.
+7. Download `Xenova/whisper-tiny.en` and transcribe the WAV and MP3 fixtures.
 
 The GitHub test workflow also runs `test:community:smoke` on an ARM64 runner. Wait for both x64 and ARM64 jobs to pass before creating a release tag.
 

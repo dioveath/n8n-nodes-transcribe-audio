@@ -16,6 +16,5 @@ services:
       - 5000:5000
     volumes:
       - ./data:/home/node/.n8n
-      - ./dist:/home/node/.n8n/custom/node_modules/${REPO_NAME}
-      - ./node_modules:/home/node/.n8n/custom/node_modules
+      - ./.docker/n8n-custom/node_modules:/home/node/.n8n/custom/node_modules:ro
       - /etc/localtime:/etc/localtime:ro

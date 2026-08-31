@@ -16,7 +16,8 @@
     "transformers.js",
     "whisper",
     "wasm",
-    "wav"
+    "wav",
+    "mp3"
   ],
   "license": "MIT",
   "publishConfig": {
@@ -47,7 +48,8 @@
     "test:community:smoke": "RUN_TRANSCRIPTION_TEST=false sh tests/alpine/run-community-test.sh",
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease",
-    "deploy": "pnpm run build && docker compose up"
+    "deploy:prepare": "pnpm run build && sh scripts/prepare-dev-package.sh",
+    "deploy": "pnpm run deploy:prepare && docker compose up"
   },
   "files": [
     "dist/nodes/AudioTranscribe"
@@ -72,6 +74,7 @@
     "n8n-workflow": "*"
   },
   "dependencies": {
+    "@audio/decode-mp3": "1.3.1",
     "onnxruntime-node": "npm:onnxruntime-web@1.24.3",
     "transformers-wasm": "npm:@huggingface/transformers@4.2.0",
     "wavefile": "^11.0.0"
