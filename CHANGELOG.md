@@ -2,13 +2,17 @@
 
 Use the latest version for the best compatibility and format support. Versions earlier than 0.2.3 are deprecated and no longer supported.
 
-## 0.2.4 — Unreleased
+## 0.2.5 — 31 August 2026
 
 ### Improved
 
 - Rewrote the documentation around practical transcription workflows and everyday usage.
 - Added a ready-to-import example workflow for transcribing WAV and MP3 form uploads.
 - Made the node's field descriptions and search terms clearer inside n8n.
+
+## 0.2.4 — Not published
+
+This version was skipped after its release tag referenced package metadata for 0.2.3. No 0.2.4 package was published to npm.
 
 ## 0.2.3 — 31 August 2026
 

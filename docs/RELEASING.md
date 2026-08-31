@@ -114,4 +114,18 @@ Every older version should show the upgrade message. The latest version must not
 
 ## 9. Recovery
 
-If publishing fails, do not reuse a version number. Fix the problem, bump to a new patch version, and run the complete checklist again.
+If publishing fails, do not reuse a version number or move its public tag. Fix the problem, bump `package.json` and the changelog to a new patch version, and run the complete checklist again.
+
+For a recovery release whose version is already set in `package.json`, commit that version before creating its matching tag. Do not run the interactive release command, because it would bump the version again:
+
+```sh
+version=$(node -p "require('./package.json').version")
+test "$version" = "0.2.5" # replace with the intended recovery version
+git add package.json CHANGELOG.md .github/workflows/publish.yml docs/RELEASING.md
+git commit -m "Release $version"
+git tag -a "$version" -m "Release $version"
+git push origin main "$version"
+gh release create "$version" --verify-tag --generate-notes --title "Release $version"
+```
+
+The publish workflow verifies that the tag and `package.json` version match before installing or publishing anything.

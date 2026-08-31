@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-transcribe-audio",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "Perform local speech-to-text. Transcribe audio files locally in self-hosted n8n with Whisper. No transcription API key required.",
   "keywords": [
     "n8n-community-node-package",
@@ -30,7 +30,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dioveath/n8n-nodes-transcribe-audio.git"
+    "url": "git+https://github.com/dioveath/n8n-nodes-transcribe-audio.git"
   },
   "engines": {
     "node": ">=22.22"
