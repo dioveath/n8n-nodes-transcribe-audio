@@ -1,6 +1,14 @@
 # Version history
 
-Use the latest version for the best compatibility and format support. Versions before 0.2.3 are deprecated on npm.
+Use the latest version for the best compatibility and format support. Versions earlier than 0.2.3 are deprecated and no longer supported.
+
+## 0.2.4 — Unreleased
+
+### Improved
+
+- Rewrote the documentation around practical transcription workflows and everyday usage.
+- Added a ready-to-import example workflow for transcribing WAV and MP3 form uploads.
+- Made the node's field descriptions and search terms clearer inside n8n.
 
 ## 0.2.3 — 31 August 2026
 
@@ -35,4 +43,4 @@ Use the latest version for the best compatibility and format support. Versions b
 
 ## Older versions
 
-Versions before 0.2.0 are no longer supported. Update from **Settings → Community Nodes**, then restart n8n.
+Versions earlier than 0.2.3 are deprecated and no longer supported. Update from **Settings → Community Nodes**, then restart n8n.

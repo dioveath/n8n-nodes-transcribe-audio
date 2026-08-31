@@ -59,6 +59,12 @@ Example output:
 }
 ```
 
+## Example workflow
+
+[Download the example workflow](https://raw.githubusercontent.com/dioveath/n8n-nodes-transcribe-audio/main/example-workflow.json), then import it into n8n. It opens a simple form where you can upload a WAV or MP3 file and passes the recording to **Transcribe Audio**.
+
+After importing it, open **Transcribe Audio** and choose the model you want to use.
+
 ## Choosing a model
 
 | Model | Best for | Trade-off |
@@ -119,7 +125,7 @@ An old package version is still installed. Remove it from **Settings → Communi
 
 ## Updating
 
-Update the package from **Settings → Community Nodes**, then restart n8n. Back up your n8n user folder before updating your n8n installation.
+Versions earlier than 0.2.3 are deprecated and no longer supported. Update the package from **Settings → Community Nodes**, then restart n8n. Back up your n8n user folder before updating your n8n installation.
 
 ## Links
 

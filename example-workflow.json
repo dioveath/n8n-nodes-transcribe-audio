@@ -1,9 +1,11 @@
 {
+  "id": "transcribe-audio-example",
+  "name": "Transcribe an uploaded audio file",
   "nodes": [
     {
       "parameters": {
-        "formTitle": "Transcription",
-        "formDescription": "To transcribe",
+        "formTitle": "Audio transcription",
+        "formDescription": "Upload a WAV or MP3 file to turn its English speech into text.",
         "formFields": {
           "values": [
             {
@@ -21,8 +23,7 @@
         0
       ],
       "id": "4ea7cf70-391c-47c6-a047-0bd4763e6a0d",
-      "name": "On form submission",
-      "webhookId": "e8017472-31e4-4e4c-b383-d9282a9ae5a7"
+      "name": "Upload audio"
     },
     {
       "parameters": {
@@ -39,7 +40,7 @@
     }
   ],
   "connections": {
-    "On form submission": {
+    "Upload audio": {
       "main": [
         [
           {
@@ -52,7 +53,6 @@
     }
   },
   "pinData": {},
-  "meta": {
-    "instanceId": "d3312e56bab30d56913ce75d74725bafad29a24c75674669542ccecd72c68bde"
-  }
+  "active": false,
+  "settings": {}
 }
