@@ -10,6 +10,7 @@ const BASE_URL = 'http://127.0.0.1:5678';
 const PACKAGE_NAME = 'n8n-nodes-transcribe-audio';
 const PACKAGE_ROOT = `/home/node/.n8n/nodes/node_modules/${PACKAGE_NAME}`;
 const AUDIO_FIXTURE = '/test/fixtures/jfk-4s.wav';
+const NATIVE_ONNX_MUSL_ERROR = /__(?:vsnprintf|sprintf)_chk: symbol not found/;
 const RUN_TRANSCRIPTION_TEST = process.env.RUN_TRANSCRIPTION_TEST !== 'false';
 const candidateManifest = JSON.parse(fs.readFileSync('/test/candidate-package.json', 'utf8'));
 
@@ -82,7 +83,7 @@ async function main() {
 		await waitForN8n(() => output);
 		assert.match(
 			output,
-			/__vsnprintf_chk: symbol not found/,
+			NATIVE_ONNX_MUSL_ERROR,
 			'the fixture must reproduce the native ONNX failure from a persisted 0.1.23 install',
 		);
 
@@ -126,7 +127,7 @@ async function main() {
 		);
 		assert.doesNotMatch(
 			output.slice(outputBeforeInstall),
-			/__vsnprintf_chk: symbol not found/,
+			NATIVE_ONNX_MUSL_ERROR,
 			'the candidate package must not load the stale native ONNX dependency',
 		);
 

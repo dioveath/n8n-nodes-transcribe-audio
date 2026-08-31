@@ -80,7 +80,7 @@ If installation appears to finish but the node is missing, read the n8n containe
 docker logs <your-n8n-container>
 ```
 
-- `__vsnprintf_chk: symbol not found` means an old native ONNX package was loaded. Update to 0.2.1 or newer and restart n8n.
+- A `__vsnprintf_chk: symbol not found` or `__sprintf_chk: symbol not found` error means an old native ONNX package was loaded. Update to 0.2.1 or newer and restart n8n.
 - An engine warning means the n8n container's Node.js version is too old. Update n8n instead of forcing the package to install.
 - A model-download error on first use is not an install error. Check container network access and free storage.
 - An out-of-memory error is not an install error. Start with `Xenova/whisper-tiny.en` and give the container more memory if needed.
