@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Added a complete packed-package transcription test using a small WAV fixture and `Xenova/whisper-tiny.en`.
+- Added native ARM64 CI coverage for the Alpine community-install and WASM smoke test.
+- Added release, deprecation, upgrade, and troubleshooting instructions.
+
+### Fixed
+
+- Auto-detect the only available binary input property when it does not match the configured property name.
+
+### Changed
+
+- Updated the pinned stock n8n integration-test image to 2.35.7.
+- Made the self-hosted and unverified-package requirements explicit.
+
 ## 0.2.1 — 2026-08-23
 
 ### Fixed

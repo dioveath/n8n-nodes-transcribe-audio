@@ -43,7 +43,8 @@
     "lint": "n8n-node lint",
     "lint:fix": "n8n-node lint --fix",
     "test": "pnpm run test:community",
-    "test:community": "docker build --file tests/alpine/Dockerfile --tag n8n-nodes-transcribe-audio:test-community . && docker run --rm n8n-nodes-transcribe-audio:test-community",
+    "test:community": "sh tests/alpine/run-community-test.sh",
+    "test:community:smoke": "RUN_TRANSCRIPTION_TEST=false sh tests/alpine/run-community-test.sh",
     "release": "n8n-node release",
     "prepublishOnly": "n8n-node prerelease",
     "deploy": "pnpm run build && docker compose up"

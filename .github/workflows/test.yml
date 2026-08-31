@@ -41,9 +41,20 @@ jobs:
         run: pnpm run build
 
   community-install:
-    name: Community install on Alpine
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+    name: Community install on Alpine (${{ matrix.architecture }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: x64
+            runner: ubuntu-latest
+            script: test:community
+          - architecture: arm64
+            runner: ubuntu-24.04-arm
+            script: test:community:smoke
 
     steps:
       - name: Checkout repository
@@ -55,4 +66,4 @@ jobs:
           node-version: '24.x'
 
       - name: Install through n8n and test WASM inference
-        run: npm run test:community
+        run: npm run ${{ matrix.script }}

@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG NODE_VERSION=24.18.0
-ARG N8N_VERSION=2.34.5
+ARG N8N_VERSION=2.35.7
 
 FROM node:${NODE_VERSION}-alpine AS package-builder
 
@@ -30,6 +30,7 @@ COPY --from=package-builder /package/*.tgz /test/candidate.tgz
 COPY package.json /test/candidate-package.json
 COPY tests/alpine/community-install.test.cjs /test/community-install.test.cjs
 COPY tests/alpine/npm-wrapper.sh /test-bin/npm
+COPY tests/fixtures /test/fixtures
 
 RUN chmod 755 /test-bin/npm \
     && mkdir -p /home/node/.n8n/nodes \
